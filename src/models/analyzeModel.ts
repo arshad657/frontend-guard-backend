@@ -13,29 +13,15 @@ export interface AnalyzeResult {
 }
 
 export class AnalyzeModel {
-  static async analyzeUrl(url: string): Promise<AnalyzeResult> {
-    let owner = "";
-    let repo = "";
-    let branch = "main";
-
-    if (url.startsWith("http")) {
-      const parsed = new URL(url);
-      const parts = parsed.pathname.split("/").filter(Boolean);
-      owner = parts[0];
-      repo = parts[1];
-      if (parts[2] === "tree" && parts[3]) {
-        branch = parts[3];
-      }
-    } else {
-      const parts = url.split("/");
-      owner = parts[0];
-      repo = parts[1];
-    }
-
-    if (!owner || !repo) {
-      throw new Error("Could not extract owner and repo from URL");
-    }
-
+  static async analyzeUrl({
+    owner,
+    repo,
+    branch,
+  }: {
+    owner: string;
+    repo: string;
+    branch: string;
+  }): Promise<AnalyzeResult> {
     const vol = await ingestRepository(owner, repo, branch);
     const tree = vol.toJSON();
     const files = getCodeFiles(tree);
